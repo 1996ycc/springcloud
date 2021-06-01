@@ -19,6 +19,12 @@ public class DeptController {
     @Autowired
     private DiscoveryClient client;
 
+    /***
+     * ccyu 2021/6/1
+     * 新增方法
+     * @param dept
+     * @return
+     */
     @PostMapping("/dept/add")
     public boolean addDept(@RequestBody Dept dept){
         return deptService.addDept(dept);
