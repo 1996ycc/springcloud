@@ -1,5 +1,6 @@
 package com.ycc.springcloud.controller;
 
+import com.netflix.hystrix.contrib.javanica.annotation.HystrixCommand;
 import com.ycc.springcloud.pojo.Dept;
 import com.ycc.springcloud.service.DeptService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,46 +17,20 @@ public class DeptController {
     @Autowired
     private DeptService deptService ;
 
-    @Autowired
-    private DiscoveryClient client;
-
-    /***
-     * ccyu 2021/6/1
-     * 新增方法
-     * @param dept
-     * @return
-     */
-    @PostMapping("/dept/add")
-    public boolean addDept(@RequestBody Dept dept){
-        return deptService.addDept(dept);
-    }
-
     @GetMapping("/dept/get/{id}")
+    @HystrixCommand(fallbackMethod = "hystrixGet")
     public Dept get(@PathVariable("id") Long id){
-        return deptService.queryById(id);
-    }
-
-    @GetMapping("/dept/list")
-    public List<Dept> queryAll(){
-        return deptService.queryAll();
-    }
-
-    @RequestMapping("/dept/discovery")
-    public Object discovery(){
-        List<String> services = client.getServices();
-        System.out.println(services);
-
-        List<ServiceInstance> instances = client.getInstances("SPRINGCLOUD-PROVIDER-DEPT");
-
-        for ( ServiceInstance  instance: instances) {
-            System.out.println(
-                    instance.getHost()+"\t"+
-                    instance.getPort()+"\t"+
-                    instance.getUri()+"\t"+
-                    instance.getInstanceId()
-            );
+        Dept dept = deptService.queryById(id);
+        if(dept == null){
+            throw new RuntimeException("id=>"+id+"，不存在该用户，或者信息无法找到！");
         }
-        return this.client;
+        return dept;
     }
+
+    // 备选方法
+    public Dept hystrixGet(@PathVariable("id") Long id){
+        return new Dept().setDNo(id).setDName("id=>"+id+"没有对应的信息,null---");
+    }
+
 
 }

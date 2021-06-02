@@ -12,6 +12,14 @@
     <artifactId>springcloud-provider-dept-8001</artifactId>
 
     <dependencies>
+
+        <!-- hystrix 服务雪崩 -->
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter-hystrix</artifactId>
+            <version>1.4.4.RELEASE</version>
+        </dependency>
+
         <!-- eureka 提供者 -->
         <dependency>
             <groupId>org.springframework.cloud</groupId>
